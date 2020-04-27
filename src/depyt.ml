@@ -430,12 +430,12 @@ type 'a compare = 'a -> 'a -> int
 module Compare = struct
 
   let unit (_:unit) (_:unit) = 0
-  let bool (x:bool) (y:bool) = Pervasives.compare x y
+  let bool (x:bool) (y:bool) = Stdlib.compare x y
   let char = Char.compare
-  let int (x:int) (y:int) = Pervasives.compare x y
+  let int (x:int) (y:int) = Stdlib.compare x y
   let int32 = Int32.compare
   let int64 = Int64.compare
-  let float (x:float) (y:float) = Pervasives.compare x y
+  let float (x:float) (y:float) = Stdlib.compare x y
   let string x y = if x == y then 0 else String.compare x y
 
   let list c x y =
@@ -753,7 +753,7 @@ module Read = struct
     int buf ~pos >>= fun (pos, len) ->
     let str = Bytes.create len in
     let () = match buf with
-    | C buf -> Cstruct.blit_to_string buf pos str 0 len
+    | C buf -> Cstruct.blit_to_bytes buf pos str 0 len
     | B buf -> Bytes.blit buf pos str 0 len
     in
     ok (pos+len) (Bytes.unsafe_to_string str)
@@ -958,8 +958,6 @@ let pp_json ?minify t ppf x =
   Fmt.string ppf (Buffer.contents buf)
 
 module Decode_json = struct
-
-  open Result
 
   type decoder = {
     mutable lexemes: Jsonm.lexeme list;
